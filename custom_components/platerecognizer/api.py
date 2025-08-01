@@ -1,44 +1,33 @@
-import os
 import aiohttp
-import logging
-from homeassistant.core import HomeAssistant
+import os
 
-_LOGGER = logging.getLogger(__name__)
-
-async def get_plate_info(hass: HomeAssistant, camera_entity_id: str, token: str, camera_id: str):
-    image_path = f"/tmp/snapshot_{camera_id}.jpg"
-
-    await hass.services.async_call(
-        "camera",
-        "snapshot",
-        {
-            "entity_id": camera_entity_id,
-            "filename": image_path
-        },
-        blocking=True
-    )
-
+async def send_image_to_api(image_path, token, camera_id):
     if not os.path.exists(image_path):
-        _LOGGER.error("Snapshot not created")
         return None
 
     url = "https://api.platerecognizer.com/v1/plate-reader/"
 
     async with aiohttp.ClientSession() as session:
-        with open(image_path, "rb") as img:
-            response = await session.post(url, data={"camera_id": camera_id}, headers={"Authorization": f"Token {token}"}, files={"upload": img})
+        with open(image_path, 'rb') as image_file:
+            form = aiohttp.FormData()
+            form.add_field("upload", image_file, filename="plate.jpg", content_type="image/jpeg")
+            form.add_field("camera_id", camera_id)
 
-        if response.status != 200:
-            _LOGGER.error("Error from Plate Recognizer API: %s", response.status)
-            return None
+            headers = {"Authorization": f"Token {token}"}
 
-        result = await response.json()
-        if not result["results"]:
-            return None
+            async with session.post(url, headers=headers, data=form) as resp:
+                if resp.status != 200:
+                    return None
+                result = await resp.json()
 
-        plate_data = result["results"][0]
-        return {
-            "plate": plate_data["plate"],
-            "region": plate_data.get("region", {}).get("code", ""),
-            "e_vehicle": "ja" if plate_data.get("vehicle", {}).get("type", "") == "electric" else "nein"
-        }
+    plate = result.get("results", [{}])[0].get("plate", "")
+    region = result.get("results", [{}])[0].get("region", {}).get("code", "")
+
+    if not plate:
+        return None
+
+    return {
+        "plate": plate,
+        "region": region,
+        "e_vehicle": "ja" if plate.endswith("e") else "nein"
+    }
