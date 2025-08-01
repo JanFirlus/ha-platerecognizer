@@ -1,22 +1,21 @@
-import logging
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.helpers.typing import ConfigType
 from .const import DOMAIN
-from .api import get_plate_info
-
-_LOGGER = logging.getLogger(__name__)
-
-async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    return True
+from .api import send_image_to_api
+import os
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def handle_scan(call: ServiceCall):
-        data = await get_plate_info(
-            hass,
-            entry.data["camera_entity"],
-            entry.data["token"],
-            entry.data["camera_id"]
+        image_path = hass.config.path("www/platecheck.jpg")
+
+        if not os.path.exists(image_path):
+            hass.states.async_set(f"{DOMAIN}.last_plate", "kein Bild vorhanden")
+            return
+
+        data = await send_image_to_api(
+            image_path=image_path,
+            token=entry.data["token"],
+            camera_id=entry.data["camera_id"]
         )
 
         if data:
@@ -29,7 +28,4 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             hass.states.async_set(f"{DOMAIN}.last_plate", "unbekannt")
 
     hass.services.async_register(DOMAIN, "scan", handle_scan)
-    return True
-
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
