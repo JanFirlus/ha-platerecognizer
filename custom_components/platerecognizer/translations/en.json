@@ -2,13 +2,12 @@
   "config": {
     "step": {
       "user": {
-        "title": "Plate Recognizer Settings",
-        "description": "Configure your RTSP camera and API token",
+        "title": "Plate Recognizer Setup",
+        "description": "Enter your API Token and Kamera Einstellungen",
         "data": {
           "token": "API Token",
-          "rtsp_url": "RTSP URL",
-          "camera_id": "Camera ID",
-          "scan_interval": "Scan Interval (seconds)"
+          "camera_id": "Kamera ID",
+          "camera_entity": "Kamera Entity ID (z.B. camera.garage_cam)"
         }
       }
     }

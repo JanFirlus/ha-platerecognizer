@@ -1,9 +1,8 @@
 {
   "name": "Plate Recognizer",
-  "content_in_root": false,
   "domain": "platerecognizer",
-  "country": "DE",
-  "render_readme": true,
-  "filename": "custom_components/platerecognizer/manifest.json",
-  "type": "integration"
+  "repository": "https://github.com/JanFirlus/ha-platerecognizer",
+  "codeowners": ["@JanFirlus"],
+  "homeassistant": "2024.5.0",
+  "iot_class": "cloud_polling"
 }

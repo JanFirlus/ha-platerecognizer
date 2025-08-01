@@ -1,35 +1,44 @@
-import subprocess
-import requests
+import os
+import aiohttp
+import logging
+from homeassistant.core import HomeAssistant
 
-async def get_plate_info(rtsp_url, token, camera_id):
-    image_path = "/tmp/snapshot.jpg"
-    ffmpeg_cmd = [
-        "ffmpeg", "-y", "-i", rtsp_url,
-        "-frames:v", "1", image_path
-    ]
+_LOGGER = logging.getLogger(__name__)
 
-    try:
-        subprocess.run(ffmpeg_cmd, check=True)
-    except subprocess.CalledProcessError:
+async def get_plate_info(hass: HomeAssistant, camera_entity_id: str, token: str, camera_id: str):
+    image_path = f"/tmp/snapshot_{camera_id}.jpg"
+
+    await hass.services.async_call(
+        "camera",
+        "snapshot",
+        {
+            "entity_id": camera_entity_id,
+            "filename": image_path
+        },
+        blocking=True
+    )
+
+    if not os.path.exists(image_path):
+        _LOGGER.error("Snapshot not created")
         return None
 
-    with open(image_path, "rb") as image_file:
-        response = requests.post(
-            "https://api.platerecognizer.com/v1/plate-reader/",
-            headers={"Authorization": f"Token {token}"},
-            files={"upload": image_file},
-            data={"camera_id": camera_id}
-        )
+    url = "https://api.platerecognizer.com/v1/plate-reader/"
 
-    if response.status_code != 200:
-        return None
+    async with aiohttp.ClientSession() as session:
+        with open(image_path, "rb") as img:
+            response = await session.post(url, data={"camera_id": camera_id}, headers={"Authorization": f"Token {token}"}, files={"upload": img})
 
-    data = response.json()
-    if not data.get("results"):
-        return None
+        if response.status != 200:
+            _LOGGER.error("Error from Plate Recognizer API: %s", response.status)
+            return None
 
-    result = data["results"][0]
-    plate = result.get("plate", "")
-    region = result.get("region", {}).get("code", "")
-    e_vehicle = "ja" if plate.endswith("e") else "nein"
-    return {"plate": plate, "region": region, "e_vehicle": e_vehicle}
+        result = await response.json()
+        if not result["results"]:
+            return None
+
+        plate_data = result["results"][0]
+        return {
+            "plate": plate_data["plate"],
+            "region": plate_data.get("region", {}).get("code", ""),
+            "e_vehicle": "ja" if plate_data.get("vehicle", {}).get("type", "") == "electric" else "nein"
+        }
