@@ -1,0 +1,16 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Plate Recognizer Settings",
+        "description": "Configure your RTSP camera and API token",
+        "data": {
+          "token": "API Token",
+          "rtsp_url": "RTSP URL",
+          "camera_id": "Camera ID",
+          "scan_interval": "Scan Interval (seconds)"
+        }
+      }
+    }
+  }
+}

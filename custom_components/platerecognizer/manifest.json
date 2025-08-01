@@ -1,0 +1,10 @@
+{
+  "domain": "platerecognizer",
+  "name": "Plate Recognizer",
+  "documentation": "https://github.com/JanFirlus/ha-platerecognizer",
+  "version": "0.0.1",
+  "requirements": ["requests", "aiohttp"],
+  "dependencies": [],
+  "codeowners": ["@JanFirlus"],
+  "config_flow": true
+}
