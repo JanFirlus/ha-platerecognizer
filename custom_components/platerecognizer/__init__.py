@@ -13,6 +13,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             return
 
         data = await send_image_to_api(
+            hass=hass,
             image_path=image_path,
             token=entry.data["token"],
             camera_id=entry.data["camera_id"]
