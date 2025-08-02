@@ -1,7 +1,7 @@
 import aiohttp
 import os
 
-async def send_image_to_api(image_path, token, camera_id):
+async def send_image_to_api(hass, image_path, token, camera_id):
     if not os.path.exists(image_path):
         return None
 
@@ -24,10 +24,14 @@ async def send_image_to_api(image_path, token, camera_id):
     region = result.get("results", [{}])[0].get("region", {}).get("code", "")
 
     if not plate:
+        hass.states.async_set("platerecognizer.last_plate", "Keine Erkennung")
         return None
+
+    hass.states.async_set("platerecognizer.last_plate", plate)
 
     return {
         "plate": plate,
         "region": region,
         "e_vehicle": "ja" if plate.endswith("e") else "nein"
     }
+
