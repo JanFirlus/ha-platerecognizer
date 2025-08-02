@@ -21,7 +21,7 @@ async def send_image_to_api(hass, image_path, token, camera_id):
 
     async with aiohttp.ClientSession() as session:
         async with session.post(url, headers=headers, data=form) as resp:
-            if resp.status != 200:
+            if resp.status not in (200, 201):
                 image_file.close()
                 hass.states.async_set("platerecognizer.last_plate", f"Fehler {resp.status}")
                 return None
