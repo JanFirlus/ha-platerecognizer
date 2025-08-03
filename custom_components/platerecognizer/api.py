@@ -42,11 +42,17 @@ async def send_image_to_api(hass, image_path, token, camera_id):
     score = round(plate_data.get("score", 0.0) * 100, 1)
     is_ev = "ja" if plate.lower().endswith("e") else "nein"
 
-    hass.states.async_set("platerecognizer.last_plate", plate)
+    hass.states.async_set("platerecognizer.last_plate", plate, {
+        "region": region,
+        "e_vehicle": is_ev,
+        "camera": camera_id,
+        "confidence": f"{score} %"
+    })
 
     return {
         "plate": plate,
         "region": region,
         "e_vehicle": is_ev,
-        "confidence": score
+        "score": score
     }
+
