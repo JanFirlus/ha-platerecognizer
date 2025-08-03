@@ -29,9 +29,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         else:
             hass.states.async_set(f"{DOMAIN}.last_plate", "unbekannt")
 
-    # ✅ Sensor-Plattform korrekt weiterleiten (ohne await!)
     hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(entry, "sensor")
+        hass.config_entries.async_forward_entry_setups(entry, "sensor")
     )
 
     # Dienst registrieren
