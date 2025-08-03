@@ -5,6 +5,5 @@
   "version": "1.0.0",
   "requirements": ["aiohttp"],
   "codeowners": ["@JanFirlus"],
-  "config_flow": true,
-  "domains": ["sensor"]
+  "config_flow": true
 }

@@ -8,7 +8,7 @@ class PlateRecognizerSensor(SensorEntity):
     def __init__(self, hass):
         self._attr_name = "Plate Recognizer Last Plate"
         self._attr_unique_id = f"{DOMAIN}_last_plate"
-        self._aattr_native_value = "unbekannt"
+        self._attr_native_value = "unbekannt"
         self.hass = hass
 
     async def async_update(self):
@@ -17,3 +17,15 @@ class PlateRecognizerSensor(SensorEntity):
             self._attr_native_value = entity.state
         else:
             self._attr_native_value = "unbekannt"
+
+    @property
+    def native_value(self):
+        return self._attr_native_value
+
+    @property
+    def unique_id(self):
+        return self._attr_unique_id
+
+    @property
+    def name(self):
+        return self._attr_name

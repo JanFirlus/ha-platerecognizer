@@ -1,6 +1,5 @@
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.helpers.typing import ConfigType
 from .const import DOMAIN
 from .api import send_image_to_api
 import os
@@ -25,13 +24,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 "region": data["region"],
                 "e_vehicle": data["e_vehicle"],
                 "camera": entry.data["camera_id"],
-                "confidence": data["score"]
+                "confidence": f"{data['score']} %"
             })
         else:
             hass.states.async_set(f"{DOMAIN}.last_plate", "unbekannt")
 
+    # Sensorplattform laden
     hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(entry, "sensor")
+        hass.config_entries.async_forward_entry_setups(entry, ["sensor"])
     )
 
     # Dienst registrieren
