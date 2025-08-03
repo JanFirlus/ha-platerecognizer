@@ -24,13 +24,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             hass.states.async_set(f"{DOMAIN}.last_plate", data["plate"], {
                 "region": data["region"],
                 "e_vehicle": data["e_vehicle"],
-                "camera": entry.data["camera_id"]
+                "camera": entry.data["camera_id"],
+                "confidence": data["score"]
             })
         else:
             hass.states.async_set(f"{DOMAIN}.last_plate", "unbekannt")
 
     hass.async_create_task(
-        hass.config_entries.async_forward_entry_setups(entry, "sensor")
+        hass.config_entries.async_forward_entry_setup(entry, "sensor")
     )
 
     # Dienst registrieren
