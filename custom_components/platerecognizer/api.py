@@ -34,9 +34,11 @@ async def send_image_to_api(hass, image_path, token, camera_id):
     if not plates:
         hass.states.async_set("platerecognizer.last_plate", "Keine Erkennung")
         return None
+    
+    plate_data = plates[0]
 
-    plate = plates[0].get("plate", "")
-    region = plates[0].get("region", {}).get("code", "")
+    plate = plate_data.get("plate", "")
+    region = plate_data.get("region", {}).get("code", "")
     score = round(plate_data.get("score", 0.0) * 100, 1)
     is_ev = "ja" if plate.lower().endswith("e") else "nein"
 
