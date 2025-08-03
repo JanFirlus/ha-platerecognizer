@@ -3,6 +3,6 @@
   "domain": "platerecognizer",
   "repository": "https://github.com/JanFirlus/ha-platerecognizer",
   "codeowners": ["@JanFirlus"],
-  "homeassistant": "2024.5.0",
+  "homeassistant": "2025.7.2",
   "iot_class": "cloud_polling"
 }
