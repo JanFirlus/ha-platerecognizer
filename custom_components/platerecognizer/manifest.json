@@ -2,7 +2,7 @@
   "domain": "platerecognizer",
   "name": "Plate Recognizer",
   "documentation": "https://github.com/JanFirlus/ha-platerecognizer",
-  "version": "1.0.0",
+  "version": "1.0.2.5",
   "requirements": ["aiohttp"],
   "codeowners": ["@JanFirlus"],
   "config_flow": true
